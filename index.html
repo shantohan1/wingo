@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Wingo Helper (Educational)</title></head>
+<body>
+  <h2>Recent Rounds</h2>
+  <button id="load">Load Last 50</button>
+  <pre id="list"></pre>
+
+  <h3>EV Calculator</h3>
+  <input id="stake" type="number" value="100" /> 
+  <select id="side"><option>BIG</option><option>SMALL</option></select>
+  <button id="ev">Calculate</button>
+  <pre id="evout"></pre>
+
+  <h3>Risk Simulator</h3>
+  <button id="sim">Run 200 rounds</button>
+  <pre id="simout"></pre>
+
+  <h3>ChatGPT Explain</h3>
+  <button id="explain">Explain last 30 rounds</button>
+  <pre id="msg"></pre>
+
+<script>
+const API = 'http://localhost:3000';
+
+document.getElementById('load').onclick = async ()=>{
+  const r = await fetch(`${API}/api/rounds/latest?n=50`).then(r=>r.json());
+  document.getElementById('list').textContent = JSON.stringify(r,null,2);
+};
+
+document.getElementById('ev').onclick = async ()=>{
+  const stake = Number(document.getElementById('stake').value);
+  const side  = document.getElementById('side').value;
+  const r = await fetch(`${API}/api/odds`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({side, stake})
+  }).then(r=>r.json());
+  document.getElementById('evout').textContent = JSON.stringify(r,null,2);
+};
+
+document.getElementById('sim').onclick = async ()=>{
+  const r = await fetch(`${API}/api/simulate`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ startingBalance:1000, stake:50, rounds:200, side:'BIG' })
+  }).then(r=>r.json());
+  document.getElementById('simout').textContent = JSON.stringify(r,null,2);
+};
+
+document.getElementById('explain').onclick = async ()=>{
+  const recent = await fetch(`${API}/api/rounds/latest?n=30`).then(r=>r.json());
+  const r = await fetch(`${API}/api/explain`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ recent })
+  }).then(r=>r.json());
+  document.getElementById('msg').textContent = r.message;
+};
+</script>
+</body>
+</html>

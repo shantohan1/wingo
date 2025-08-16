@@ -1,0 +1,17 @@
+CREATE TABLE rounds (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  round_no VARCHAR(50) UNIQUE,
+  result_int INT NOT NULL,
+  result_label ENUM('BIG','SMALL','ODD','EVEN') NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE bets (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  round_no VARCHAR(50),
+  side ENUM('BIG','SMALL','ODD','EVEN'),
+  stake DECIMAL(10,2),
+  outcome ENUM('WIN','LOSE') NULL,
+  balance_after DECIMAL(12,2) NULL,
+  bet_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
